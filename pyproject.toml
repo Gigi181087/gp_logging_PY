@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gp_logging"
+version = "0.1.0"
+description = "logging module to fulfill the BSI requirements"
+authors = [{name = "Gian Piero", email = "gpcecchetti@googlemail.com"}]
+dependencies = ["requests", "numpy"]
+
+[project.optional-dependencies]
+dev = ["pytest", "black"]
