@@ -33,14 +33,14 @@ class gp_logger:
             gp_log_level.WARNING: gp_log_colors.YELLOW,
             gp_log_level.ERROR: gp_log_colors.RED
         }
+        self.debug_enabled = False
 
         return
     
 
     def enable_file_log(self, file_path: str, file_name: str) -> bool:
         #check file path, if correct
-
-        self.file_path = file_path
+        self.file_path = os.path.join(file_path, file_name)
         self.file_log_enabled = True
 
         return True
@@ -54,6 +54,11 @@ class gp_logger:
     
 
     def log(self, log_level: gp_log_level, message: str) -> None:
+
+        if log_level == gp_log_level.DEBUG and not self.debug_enabled:
+
+            return
+        
         formatted_message = message.replace('\n', "\n".ljust(42))
         timestamp = f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S.")}{datetime.now().microsecond // 1000:03d}'
         log_text = f'{(timestamp + "      " + log_level.value).ljust(41)}{formatted_message}'
@@ -61,8 +66,8 @@ class gp_logger:
 
         if self.file_log_enabled:
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                f.write(log_text)
+            with open(self.file_path, "a", encoding="utf-8") as f:
+                f.write(log_text + '\n')
 
         return
     
