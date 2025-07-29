@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 from datetime import datetime
+from pathlib import Path
 
 
 class gp_log_colors(Enum):
@@ -25,7 +26,7 @@ class gp_logger:
 
     def __init__(self) -> None:
         self.file_log_enabled = False
-        self.file_path = None
+        self.file_path: Path = None
         self.line_length = 256
         self.log_colors = {
             gp_log_level.DEBUG: gp_log_colors.BLUE,
@@ -38,17 +39,25 @@ class gp_logger:
         return
     
 
-    def enable_file_log(self, file_path: str, file_name: str) -> bool:
+    def enable_file_log(self, file_path: str, file_name: str) -> None:
         #check file path, if correct
-        self.file_path = os.path.join(file_path, file_name)
-        self.file_log_enabled = True
+        new_path = Path(file_path)
 
-        return True
+        try:
+            new_path.mkdir(parents = True, exist_ok = True)
+            self.file_path = new_path / file_name
+            self.file_log_enabled = True
+        
+        except Exception as e:
+            self.log(gp_log_level.ERROR, f'Couldn\'t create filepath. Error {e}')
+
+
+        return
     
 
     def disable_file_log(self) -> None:
         self.file_path = None
-        self.enable_file_log = False
+        self.file_log_enabled = False
 
         return
     
@@ -66,7 +75,7 @@ class gp_logger:
 
         if self.file_log_enabled:
 
-            with open(self.file_path, "a", encoding="utf-8") as f:
+            with self.file_path.open('a', encoding="utf-8") as f:
                 f.write(log_text + '\n')
 
         return
